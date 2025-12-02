@@ -1,0 +1,10 @@
+pandas
+numpy
+jupyterlab
+ipykernel
+ipython
+ipython-sql
+sqlalchemy
+psycopg2-binary   # PostgreSQL driver
+pymysql           # MySQL driver
+pyodbc            # ODBC / MS SQL Server driver
