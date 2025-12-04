@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Record Management System</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Overall styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background-color: #007bff; /* Blue primary */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #00bcd4; /* Teal accent */
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        header p {
+            margin: 5px 0 0;
+            font-size: 1.2em;
+        }
+
+        /* Container */
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        /* Sidebar */
+        aside {
+            width: 250px;
+            background-color: #ffffff;
+            border-right: 1px solid #dee2e6;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px 0 0 8px;
+        }
+
+        aside ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        aside li {
+            margin-bottom: 10px;
+        }
+
+        aside a {
+            text-decoration: none;
+            color: #007bff;
+            display: block;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        aside a:hover {
+            background-color: #e9f7f9;
+        }
+
+        /* Main content */
+        main {
+            flex: 1;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+        }
+
+        .output-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .output-table th, .output-table td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .output-table th {
+            background-color: #f8f9fa;
+        }
+
+        /* ER Diagram */
+        .er-diagram {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: relative;
+            height: 300px;
+        }
+
+        .entity {
+            background-color: #e9f7f9;
+            border: 1px solid #00bcd4;
+            border-radius: 4px;
+            padding: 10px;
+            width: 150px;
+            text-align: center;
+            position: relative;
+        }
+
+        .entity ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .line {
+            position: absolute;
+            border-top: 1px solid #007bff;
+        }
+
+        /* CRUD Cards */
+        .crud-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .crud-card {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .crud-card h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #00bcd4;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0097a7;
+        }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-container {
+            height: 300px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+        }
+
+        /* Icons */
+        i {
+            margin-right: 5px;
+            color: #00bcd4;
+        }
+
+        /* Patient Table */
+        #patient-table {
+            margin-top: 20px;
+        }
+
+        .alert {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Enhanced for Health Records */
+        .record-details {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1>Health Record Management System</h1>
+        <p>Manage Patient Records Securely and Efficiently</p>
+    </header>
+
+    <!-- Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside>
+            <ul>
+                <li><a href="#dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#patients"><i class="fas fa-users"></i> Patients</a></li>
+                <li><a href="#add-patient"><i class="fas fa-plus"></i> Add Patient</a></li>
+                <li><a href="#records"><i class="fas fa-file-medical"></i> Medical Records</a></li>
+                <li><a href="#analytics"><i class="fas fa-chart-bar"></i> Analytics</a></li>
+                <li><a href="#settings"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Dashboard -->
+            <section id="dashboard" class="card">
+                <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                <p>Welcome to the Health Record Management System. Overview of key metrics.</p>
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>Total Patients</h3>
+                        <p id="total-patients">2</p>
+                    </div>
+                    <div class="card">
+                        <h3>Recent Visits</h3>
+                        <p>5 in the last week</p>
+                    </div>
+                    <div class="card">
+                        <h3>Alerts</h3>
+                        <p>No critical alerts</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Patients Section -->
+            <section id="patients" class="card">
+                <h2><i class="fas fa-users"></i> Patient List</h2>
+                <input type="text" id="patient-search" placeholder="Search by ID or Name">
+                <button id="search-btn">Search</button>
+                <table id="patient-table" class="output-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Initial data -->
+                        <tr data-id="1">
+                            <td>1</td><td>John Doe</td><td>30</td><td>Male</td>
+                            <td><button class="view-details">View</button> <button class="edit-patient">Edit</button> <button class="delete-patient">Delete</button></td>
+                        </tr>
+                        <tr data-id="2">
+                            <td>2</td><td>Jane Smith</td><td>28</td><td>Female</td>
+                            <td><button class="view-details">View</button> <button class="edit-patient">Edit</button> <button class="delete-patient">Delete</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Add Patient -->
+            <section id="add-patient" class="card">
+                <h2><i class="fas fa-user-plus"></i> Add New Patient</h2>
+                <form id="add-patient-form">
+                    <input type="text" id="add-name" placeholder="Name" required>
+                    <input type="number" id="add-age" placeholder="Age" required>
+                    <select id="add-gender" required>
+                        <option value="">Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <textarea id="add-medical-history" placeholder="Medical History"></textarea>
+                    <button type="submit">Add Patient</button>
+                </form>
+                <div id="add-alert" class="alert"></div>
+            </section>
+
+            <!-- Analytics -->
+            <section id="analytics" class="card">
+                <h2><i class="fas fa-chart-pie"></i> Analytics</h2>
+                <div class="dashboard-grid">
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        Built with HTML, CSS, and JavaScript • © 2025 Health RMS
+    </footer>
+
+    <script>
+        // Sample data for charts
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        const barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Flu', 'Diabetes', 'Hypertension', 'COVID'],
+                datasets: [{
+                    label: 'Patient Counts by Disease',
+                    data: [50, 30, 40, 20],
+                    backgroundColor: '#00bcd4'
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        const pieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Male', 'Female', 'Other'],
+                datasets: [{
+                    data: [60, 35, 5],
+                    backgroundColor: ['#007bff', '#00bcd4', '#6c757d']
+                }]
+            }
+        });
+
+        // Smooth scrolling for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Interactive Features
+        let nextId = 3;
+        const tableBody = document.querySelector('#patient-table tbody');
+        const totalPatients = document.getElementById('total-patients');
+
+        // Add Patient
+        const addForm = document.getElementById('add-patient-form');
+        const addAlert = document.getElementById('add-alert');
+        addForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('add-name').value.trim();
+            const age = document.getElementById('add-age').value.trim();
+            const gender = document.getElementById('add-gender').value;
+            const history = document.getElementById('add-medical-history').value.trim();
+            if (name && age && gender) {
+                const newRow = document.createElement('tr');
+                newRow.setAttribute('data-id', nextId);
+                newRow.setAttribute('data-history', history);
+                newRow.innerHTML = `
+                    <td>${nextId}</td>
+                    <td>${name}</td>
+                    <td>${age}</td>
+                    <td>${gender}</td>
+                    <td><button class="view-details">View</button> <button class="edit-patient">Edit</button> <button class="delete-patient">Delete</button></td>
+                `;
+                tableBody.appendChild(newRow);
+                nextId++;
+                totalPatients.textContent = nextId - 1;
+                addAlert.classList.add('success');
+                addAlert.textContent = 'Patient added successfully!';
+                addAlert.style.display = 'block';
+                addForm.reset();
+            } else {
+                addAlert.classList.add('error');
+                addAlert.textContent = 'Please fill required fields.';
+                addAlert.style.display = 'block';
+            }
+            setTimeout(() => { addAlert.style.display = 'none'; addAlert.classList.remove('success', 'error'); }, 3000);
+        });
+
+        // Search Patients
+        const searchBtn = document.getElementById('search-btn');
+        const patientSearch = document.getElementById('patient-search');
+        searchBtn.addEventListener('click', () => {
+            const search = patientSearch.value.trim().toLowerCase();
+            const rows = tableBody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const id = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                row.style.display = (search && !(id.includes(search) || name.includes(search))) ? 'none' : '';
+            });
+        });
+
+        // View, Edit, Delete Delegation
+        tableBody.addEventListener('click', (e) => {
+            const target = e.target;
+            const row = target.closest('tr');
+            const id = row.getAttribute('data-id');
+
+            if (target.classList.contains('delete-patient')) {
+                if (confirm('Are you sure you want to delete this patient?')) {
+                    row.remove();
+                    totalPatients.textContent = document.querySelectorAll('#patient-table tbody tr').length;
+                }
+            } else if (target.classList.contains('view-details')) {
+                const name = row.querySelector('td:nth-child(2)').textContent;
+                const age = row.querySelector('td:nth-child(3)').textContent;
+                const gender = row.querySelector('td:nth-child(4)').textContent;
+                const history = row.getAttribute('data-history');
+                alert(`Patient Details:\nID: ${id}\nName: ${name}\nAge: ${age}\nGender: ${gender}\nMedical History: ${history || 'None'}`);
+            } else if (target.classList.contains('edit-patient')) {
+                const newName = prompt('New Name:', row.querySelector('td:nth-child(2)').textContent);
+                const newAge = prompt('New Age:', row.querySelector('td:nth-child(3)').textContent);
+                const newGender = prompt('New Gender (Male/Female/Other):', row.querySelector('td:nth-child(4)').textContent);
+                const newHistory = prompt('New Medical History:', row.getAttribute('data-history'));
+                if (newName) row.querySelector('td:nth-child(2)').textContent = newName;
+                if (newAge) row.querySelector('td:nth-child(3)').textContent = newAge;
+                if (newGender) row.querySelector('td:nth-child(4)').textContent = newGender;
+                if (newHistory) row.setAttribute('data-history', newHistory);
+            }
+        });
+    </script>
+</body>
+</html>
